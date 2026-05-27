@@ -4,3 +4,8 @@ dist/
 build/
 coverage/
 *.log
+.next/
+.cache/
+tmp/
+*.tar
+*.zip
