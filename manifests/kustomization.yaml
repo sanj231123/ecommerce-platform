@@ -1,36 +1,63 @@
 resources:
+  # Namespace
   - namespace.yml
 
+  # Frontend
   - frontend/deployment.yml
   - frontend/service.yml
 
+  # API Gateway
   - services/api-gateway/deployment.yml
   - services/api-gateway/service.yml
 
+  # Auth Service
   - services/auth-service/deployment.yml
   - services/auth-service/service.yml
 
+  # Cart Service
   - services/cart-service/deployment.yml
   - services/cart-service/service.yml
 
+  # Order Service
   - services/order-service/deployment.yml
   - services/order-service/service.yml
 
+  # Payment Service
   - services/payment-service/deployment.yml
   - services/payment-service/service.yml
 
+  # Product Service
   - services/product-service/deployment.yml
   - services/product-service/service.yml
 
+  # User Service
   - services/user-service/deployment.yml
   - services/user-service/service.yml
 
+  # Notification Service
   - notification/deployment.yml
 
-  - networking/ingress.yml
+  # Infrastructure
+  - infra/mysql/deployment.yml
+  - infra/mysql/service.yml
 
+  - infra/redis/deployment.yml
+  - infra/redis/service.yml
+
+  - infra/rabbitmq/deployment.yml
+  - infra/rabbitmq/rabbitmq-service.yaml
+
+  # Gateway API
+  - networking/gateway-api/gatewayclass.yml
+  - networking/gateway-api/gateway.yml
+  - networking/gateway-api/httproute.yml
+
+  # HPA
   - hpa/cart-hpa.yml
   - hpa/order-hpa.yml
+  - hpa/payment-hpa.yml
+  - hpa/product-hpa.yml
 
+  # CronJobs
   - cronjobs/etcd-backup-cronjob.yml
   - cronjobs/unpaid-order-cleanup.yml
