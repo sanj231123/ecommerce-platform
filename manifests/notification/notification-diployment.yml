@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: notification-service
+  namespace: ecom
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: notification-service
+
+  template:
+    metadata:
+      labels:
+        app: notification-service
+
+    spec:
+      containers:
+
+      - name: notification-service
+        image: sanj231123/notification-service:v1
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 5008
+
+        env:
+
+        - name: RABBITMQ_URL
+          value: "amqp://rabbitmq:5672"
+
+        - name: EMAIL_USER
+          value: "sanjay.p@height8tech.com"
+
+        - name: EMAIL_PASS
+          value: "rvxf nawn boyy fhlr"

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: ecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order
+        image: sanj231123/order-service:v17
+        ports:
+        - containerPort: 8086
+        resources:
+
+          requests:
+            cpu: "150m"
+            memory: "256Mi"
+
+          limits:
+            cpu: "700m"
+            memory: "700Mi"  

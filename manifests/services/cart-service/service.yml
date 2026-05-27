@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service        # ✅ FIXED
+  namespace: ecom
+spec:
+  selector:
+    app: cart-service       # ✅ FIXED
+  ports:
+  - port: 8085
+    targetPort: 8085 

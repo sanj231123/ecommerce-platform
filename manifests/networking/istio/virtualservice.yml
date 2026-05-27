@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ecom-vs
+  namespace: ecom
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - istio-system/ecom-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/products
+    route:
+    - destination:
+        host: api-gateway.ecom.svc.cluster.local
+        port:
+          number: 8080
+
+  - match:
+    - uri:
+        prefix: /api
+    route:
+    - destination:
+        host: api-gateway.ecom.svc.cluster.local
+        port:
+          number: 8080

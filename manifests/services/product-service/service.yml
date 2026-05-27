@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service          # ✅ changed
+  namespace: ecom
+spec:
+  selector:
+    app: product-service         # ✅ MUST match deployment label
+  ports:
+  - port: 8083
+    targetPort: 8083 

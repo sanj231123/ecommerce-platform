@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: payment-service
+  namespace: ecom
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: payment-service
+
+  template:
+    metadata:
+      labels:
+        app: payment-service
+
+    spec:
+      containers:
+
+      - name: payment-service
+
+        image: sanj231123/payment-service:v5
+
+        ports:
+        - containerPort: 5007
+        resources:
+
+          requests:
+            cpu: "150m"
+            memory: "256Mi"
+
+          limits:
+            cpu: "700m"
+            memory: "700Mi"  
+
+        env:
+
+        - name: PORT
+          value: "5007"
+
+        - name: DB_HOST
+          value: "mysql"
+
+        - name: DB_USER
+          value: "root"
+
+        - name: DB_PASSWORD
+          value: "root123"
+
+        - name: DB_NAME
+          value: "ecommerce"
+
+        - name: DB_PORT
+          value: "3306"
+
+        - name: JWT_SECRET
+          value: "secret123"
