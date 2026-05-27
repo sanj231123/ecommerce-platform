@@ -1,0 +1,37 @@
+resources:
+  - namespace.yml
+
+  - frontend/deployment.yml
+  - frontend/service.yml
+
+  - services/api-gateway/deployment.yml
+  - services/api-gateway/service.yml
+
+  - services/auth-service/deployment.yml
+  - services/auth-service/service.yml
+
+  - services/cart-service/deployment.yml
+  - services/cart-service/service.yml
+
+  - services/order-service/deployment.yml
+  - services/order-service/service.yml
+
+  - services/payment-service/deployment.yml
+  - services/payment-service/service.yml
+
+  - services/product-service/deployment.yml
+  - services/product-service/service.yml
+
+  - services/user-service/deployment.yml
+  - services/user-service/service.yml
+
+  - services/notification-service/deployment.yml
+  - services/notification-service/service.yml
+
+  - networking/ingress.yml
+
+  - hpa/cart-hpa.yml
+  - hpa/order-hpa.yml
+
+  - cronjobs/etcd-backup-cronjob.yml
+  - cronjobs/unpaid-order-cleanup.yml
