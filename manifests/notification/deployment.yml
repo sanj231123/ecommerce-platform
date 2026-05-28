@@ -21,8 +21,8 @@ spec:
       containers:
 
       - name: notification-service
-        image: sanj231123/notification-service:v1
-        imagePullPolicy: Never
+        image: sanj231123/notification-service:v3
+        imagePullPolicy: Always
 
         ports:
         - containerPort: 5008
@@ -36,4 +36,4 @@ spec:
           value: "sanjay.p@height8tech.com"
 
         - name: EMAIL_PASS
-          value: "rvxf nawn boyy fhlr"
+          value: "rvxfnawnboyyfhlr"
