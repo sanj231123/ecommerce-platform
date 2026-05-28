@@ -1,11 +1,28 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
+const promBundle = require("express-prom-bundle");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// ======================================
+// PROMETHEUS METRICS
+// ======================================
+
+const metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+
+  promClient: {
+    collectDefaultMetrics: {}
+  }
+});
+
+app.use(metricsMiddleware);
 
 // ======================================
 // SERVICE URLS

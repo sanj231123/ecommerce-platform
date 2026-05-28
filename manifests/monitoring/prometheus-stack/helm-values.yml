@@ -1,0 +1,20 @@
+grafana:
+  adminPassword: admin123
+
+  service:
+    type: NodePort
+    nodePort: 32000
+
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 32001
+
+alertmanager:
+  enabled: true
+
+prometheus-node-exporter:
+  enabled: true
+
+kube-state-metrics:
+  enabled: true
