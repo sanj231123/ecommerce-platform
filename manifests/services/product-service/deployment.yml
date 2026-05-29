@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: product            # ✅ optional but good
-        image: sanj231123/product-service:v2   # ✅ changed
+        image: sanj231123/product-service:v3   # ✅ changed
         ports:
         - containerPort: 8083
         resources:

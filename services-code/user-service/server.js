@@ -5,12 +5,34 @@ const cors = require("cors");
 
 const { connectDB, sequelize } = require("./config/db");
 
+const {
+  register,
+  httpRequestsTotal
+} = require("./metrics/metrics");
+
 const app = express();
 
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+
+// Metrics Middleware
+app.use((req, res, next) => {
+
+  res.on("finish", () => {
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.path,
+      status: res.statusCode
+    });
+
+  });
+
+  next();
+});
 
 
 // Routes
@@ -23,14 +45,23 @@ app.get("/", (req, res) => {
 });
 
 
+// Metrics Endpoint
+app.get("/metrics", async (req, res) => {
+
+  res.set("Content-Type", register.contentType);
+
+  res.end(await register.metrics());
+
+});
+
+
 // Start Server
 const startServer = async () => {
+
   try {
 
-    // Database Connect
     await connectDB();
 
-    // Sync Tables
     await sequelize.sync();
 
     console.log("✅ Database Synced");
@@ -42,7 +73,9 @@ const startServer = async () => {
     });
 
   } catch (error) {
+
     console.log("❌ Server Error:", error.message);
+
   }
 };
 

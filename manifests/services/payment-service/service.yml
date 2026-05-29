@@ -5,11 +5,18 @@ metadata:
   name: payment-service
   namespace: ecom
 
+  labels:
+    app: payment-service
+
 spec:
+
   selector:
     app: payment-service
 
   ports:
-    - protocol: TCP
-      port: 5007
-      targetPort: 5007
+  - name: http
+    protocol: TCP
+    port: 5007
+    targetPort: 5007
+
+  type: ClusterIP

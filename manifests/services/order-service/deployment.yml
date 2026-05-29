@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: order
-        image: sanj231123/order-service:v17
+        image: sanj231123/order-service:v18
         ports:
         - containerPort: 8086
         resources:

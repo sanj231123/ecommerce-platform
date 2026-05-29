@@ -21,7 +21,7 @@ spec:
       containers:
 
       - name: notification-service
-        image: notification-service:v3
+        image: notification-service:v4
         imagePullPolicy: Never
 
         ports:

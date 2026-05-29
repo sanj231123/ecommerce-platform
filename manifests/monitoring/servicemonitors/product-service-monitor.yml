@@ -2,22 +2,23 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 
 metadata:
-  name: api-gateway-monitor
+  name: product-service-monitor
   namespace: monitoring
- 
+
   labels:
     release: monitoring
 
 spec:
-  selector:
-    matchLabels:
-      app: api-gateway
 
   namespaceSelector:
     matchNames:
       - ecom
 
+  selector:
+    matchLabels:
+      app: product-service
+
   endpoints:
-    - port: http
-      path: /metrics
-      interval: 15s
+  - port: http
+    path: /metrics
+    interval: 15s

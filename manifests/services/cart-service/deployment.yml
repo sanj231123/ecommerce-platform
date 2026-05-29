@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: cart
-        image: sanj231123/cart-service:v8
+        image: sanj231123/cart-service:v13
         ports:
         - containerPort: 8085
         resources:

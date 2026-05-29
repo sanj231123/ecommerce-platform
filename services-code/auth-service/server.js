@@ -2,9 +2,40 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const mysql = require("mysql2");
 
+const {
+  register,
+  httpRequestDurationMicroseconds,
+} = require("./metrics");
+
 const app = express();
 
 app.use(express.json());
+
+// ======================================
+// METRICS MIDDLEWARE
+// ======================================
+
+app.use((req, res, next) => {
+
+  const start = Date.now();
+
+  res.on("finish", () => {
+
+    const duration = Date.now() - start;
+
+    httpRequestDurationMicroseconds
+      .labels(
+        req.method,
+        req.route?.path || req.path,
+        res.statusCode
+      )
+      .observe(duration);
+
+  });
+
+  next();
+
+});
 
 // ======================================
 // MYSQL CONNECTION
@@ -62,12 +93,19 @@ app.get("/", (req, res) => {
 
 app.post("/register", (req, res) => {
 
-  const {
+  let {
     name,
     email,
     mobile,
     password
   } = req.body;
+
+  // REMOVE EXTRA SPACES
+
+  name = name?.trim();
+  email = email?.trim();
+  mobile = mobile?.trim();
+  password = password?.trim();
 
   // VALIDATION
 
@@ -100,6 +138,8 @@ app.post("/register", (req, res) => {
         });
 
       }
+
+      // USER EXISTS
 
       if (checkResult.length > 0) {
 
@@ -162,10 +202,17 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
 
-  const {
+  let {
     email,
     password
   } = req.body;
+
+  // REMOVE EXTRA SPACES
+
+  email = email?.trim();
+  password = password?.trim();
+
+  // VALIDATION
 
   if (!email || !password) {
 
@@ -176,20 +223,18 @@ app.post("/login", (req, res) => {
 
   }
 
-  // LOGIN USING EMAIL OR MOBILE
+  // FIND USER
 
   db.query(
 
     `
     SELECT * FROM users
-    WHERE (email=? OR mobile=?)
-    AND password=?
+    WHERE email=? OR mobile=?
     `,
 
     [
       email,
-      email,
-      password
+      email
     ],
 
     (err, result) => {
@@ -205,6 +250,8 @@ app.post("/login", (req, res) => {
 
       }
 
+      // USER NOT FOUND
+
       if (result.length === 0) {
 
         return res.status(401).json({
@@ -215,6 +262,17 @@ app.post("/login", (req, res) => {
       }
 
       const user = result[0];
+
+      // PASSWORD CHECK
+
+      if (user.password !== password) {
+
+        return res.status(401).json({
+          success: false,
+          message: "Invalid credentials"
+        });
+
+      }
 
       // JWT TOKEN
 
@@ -233,6 +291,8 @@ app.post("/login", (req, res) => {
         }
 
       );
+
+      // SUCCESS RESPONSE
 
       res.json({
 
@@ -259,6 +319,18 @@ app.post("/login", (req, res) => {
 });
 
 // ======================================
+// METRICS ENDPOINT
+// ======================================
+
+app.get("/metrics", async (req, res) => {
+
+  res.set("Content-Type", register.contentType);
+
+  res.end(await register.metrics());
+
+});
+
+// ======================================
 // START SERVER
 // ======================================
 
@@ -270,3 +342,4 @@ app.listen(8081, () => {
   console.log("=====================================");
 
 });
+

@@ -3,11 +3,50 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+const client = require("prom-client");
 
 const app = express();
 
+// ======================================
+// PROMETHEUS METRICS
+// ======================================
+
+const register = new client.Registry();
+
+client.collectDefaultMetrics({
+  register
+});
+
+const httpRequestsTotal = new client.Counter({
+  name: "product_service_http_requests_total",
+  help: "Total HTTP Requests",
+  labelNames: ["method", "route", "status"]
+});
+
+register.registerMetric(httpRequestsTotal);
+
 app.use(express.json());
 app.use(cors());
+
+// ======================================
+// REQUEST COUNTER
+// ======================================
+
+app.use((req, res, next) => {
+
+  res.on("finish", () => {
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.path,
+      status: res.statusCode
+    });
+
+  });
+
+  next();
+
+});
 
 app.use("/uploads", express.static("uploads"));
 
@@ -421,6 +460,17 @@ app.get("/reviews/:id", (req, res) => {
 
 });
 
+// ======================================
+// METRICS ENDPOINT
+// ======================================
+
+app.get("/metrics", async (req, res) => {
+
+  res.set("Content-Type", register.contentType);
+
+  res.end(await register.metrics());
+
+});
 
 // ======================================
 // SERVER

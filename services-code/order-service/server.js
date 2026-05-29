@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const client = require("prom-client");
 
 require("dotenv").config();
 
@@ -12,8 +13,46 @@ const {
 
 const app = express();
 
+// ======================================
+// PROMETHEUS METRICS
+// ======================================
+
+const register = new client.Registry();
+
+client.collectDefaultMetrics({
+  register
+});
+
+const httpRequestsTotal = new client.Counter({
+  name: "order_service_http_requests_total",
+  help: "Total HTTP Requests",
+  labelNames: ["method", "route", "status"]
+});
+
+register.registerMetric(httpRequestsTotal);
+
 app.use(cors());
 app.use(express.json());
+
+// ======================================
+// REQUEST COUNTER
+// ======================================
+
+app.use((req, res, next) => {
+
+  res.on("finish", () => {
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.path,
+      status: res.statusCode
+    });
+
+  });
+
+  next();
+
+});
 
 
 // ======================================
@@ -633,6 +672,17 @@ app.put(
 
 );
 
+// ======================================
+// METRICS ENDPOINT
+// ======================================
+
+app.get("/metrics", async (req, res) => {
+
+  res.set("Content-Type", register.contentType);
+
+  res.end(await register.metrics());
+
+});
 
 // ======================================
 // START SERVER

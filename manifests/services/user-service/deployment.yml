@@ -19,58 +19,62 @@ spec:
 
     spec:
       containers:
-        - name: user-service
 
-          image: sanj231123/user-service:v3
+      - name: user-service
 
-          ports:
-            - containerPort: 5006
-          resources:
+        image: sanj231123/user-service:v5
 
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
+        ports:
+        - name: http
+          containerPort: 5006
 
-            limits:
-              cpu: "500m"
-              memory: "512Mi"    
+        resources:
 
-          env:
-            - name: PORT
-              value: "5006"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
 
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: user-secret
-                  key: DB_HOST
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 
-            - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: user-secret
-                  key: DB_USER
+        env:
 
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: user-secret
-                  key: DB_PASSWORD
+        - name: PORT
+          value: "5006"
 
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: user-secret
-                  key: DB_NAME
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: DB_HOST
 
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: user-secret
-                  key: DB_PORT
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: DB_USER
 
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: user-secret
-                  key: JWT_SECRET
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: DB_PASSWORD
+
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: DB_NAME
+
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: DB_PORT
+
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: JWT_SECRET
