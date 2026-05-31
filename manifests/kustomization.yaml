@@ -35,7 +35,8 @@ resources:
   - services/user-service/service.yml
 
   # Notification Service
-  - notification/deployment.yml
+  - services/notification-service/notification-deployment.yml
+  - services/notification-service/service.yml
 
   # Infrastructure
   - infra/mysql/deployment.yml
