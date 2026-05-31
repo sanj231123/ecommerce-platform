@@ -21,8 +21,8 @@ spec:
       containers:
 
       - name: notification-service
-        image: notification-service:v4
-        imagePullPolicy: Never
+        image: sanj231123/notification-service:v7
+        imagePullPolicy: Always
 
         ports:
         - containerPort: 5008
