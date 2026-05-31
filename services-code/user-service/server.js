@@ -44,6 +44,13 @@ app.get("/", (req, res) => {
   res.send("User Service Running...");
 });
 
+// Kubernetes Health Check
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "UP",
+    service: "user-service"
+  });
+});
 
 // Metrics Endpoint
 app.get("/metrics", async (req, res) => {

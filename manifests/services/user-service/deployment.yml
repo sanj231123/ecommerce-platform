@@ -22,7 +22,7 @@ spec:
 
       - name: user-service
 
-        image: sanj231123/user-service:v5
+        image: sanj231123/user-service:v6
 
         ports:
         - name: http
