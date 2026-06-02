@@ -26,6 +26,23 @@ spec:
 
         ports:
         - containerPort: 5008
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5008
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5008
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3  
 
         env:
 
