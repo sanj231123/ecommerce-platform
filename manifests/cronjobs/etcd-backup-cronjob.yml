@@ -8,29 +8,35 @@ metadata:
 spec:
   schedule: "0 */2 * * *"
 
+  concurrencyPolicy: Forbid
+
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 2
 
   jobTemplate:
     spec:
-      template:
+      ttlSecondsAfterFinished: 3600
 
+      template:
         metadata:
           annotations:
             sidecar.istio.io/inject: "false"
 
         spec:
-
           hostNetwork: true
           restartPolicy: OnFailure
 
           nodeSelector:
             node-role.kubernetes.io/control-plane: ""
 
+          tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+            effect: NoSchedule
+
           containers:
           - name: etcd-backup
-
-            image: bitnami/etcd:latest
+            image: registry.k8s.io/etcd:3.5.15-0
 
             env:
             - name: ETCDCTL_API
@@ -40,6 +46,8 @@ spec:
             - /bin/sh
             - -c
             - |
+              mkdir -p /backup/etcd
+
               TIMESTAMP=$(date +%d%m%Y_%H%M)
 
               etcdctl \
@@ -61,7 +69,6 @@ spec:
               requests:
                 cpu: "100m"
                 memory: "128Mi"
-
               limits:
                 cpu: "300m"
                 memory: "256Mi"
@@ -74,3 +81,4 @@ spec:
           - name: backup-storage
             hostPath:
               path: /backup/etcd
+              type: DirectoryOrCreate
