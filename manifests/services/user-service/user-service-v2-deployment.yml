@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: user-service
+  name: user-service-v2
   namespace: ecom
 
 spec:
@@ -10,24 +10,26 @@ spec:
 
   selector:
     matchLabels:
-      app: user-service 
+      app: user-service
+      version: v2
 
   template:
     metadata:
       labels:
         app: user-service
-        version: v1  
+        version: v2
 
     spec:
       containers:
 
       - name: user-service
 
-        image: sanj231123/user-service:v6
+        image: sanj231123/user-service:v8
 
         ports:
         - name: http
           containerPort: 5006
+
         livenessProbe:
           httpGet:
             path: /health
@@ -44,10 +46,9 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 3
-          failureThreshold: 3    
+          failureThreshold: 3
 
         resources:
-
           requests:
             cpu: "100m"
             memory: "128Mi"

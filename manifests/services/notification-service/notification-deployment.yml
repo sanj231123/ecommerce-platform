@@ -21,7 +21,7 @@ spec:
       containers:
 
       - name: notification-service
-        image: sanj231123/notification-service:v9
+        image: sanj231123/notification-service:v10
         imagePullPolicy: Always
 
         ports:
@@ -50,7 +50,13 @@ spec:
           value: "amqp://rabbitmq:5672"
 
         - name: EMAIL_USER
-          value: "sanjay.p@height8tech.com"
+          valueFrom:
+            secretKeyRef:
+              name: notification-secret
+              key: EMAIL_USER
 
         - name: EMAIL_PASS
-          value: "YOUR_APP_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: notification-secret
+              key: EMAIL_PASS

@@ -1,0 +1,14 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-api-gateway
+  namespace: ecom
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+
+  action: ALLOW
+
+  rules:
+  - {}
