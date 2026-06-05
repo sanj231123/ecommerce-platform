@@ -3,6 +3,7 @@ kind: AuthorizationPolicy
 metadata:
   name: auth-service-policy
   namespace: ecom
+
 spec:
   selector:
     matchLabels:
@@ -11,7 +12,15 @@ spec:
   action: ALLOW
 
   rules:
+
+  # application traffic
   - from:
     - source:
         principals:
         - cluster.local/ns/ecom/sa/default
+
+  # prometheus scraping
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/monitoring/sa/monitoring-kube-prometheus-prometheus

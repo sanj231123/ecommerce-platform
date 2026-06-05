@@ -1,0 +1,26 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"security.istio.io/v1","kind":"AuthorizationPolicy","metadata":{"annotations":{},"name":"auth-service-policy","namespace":"ecom"},"spec":{"action":"ALLOW","rules":[{"from":[{"source":{"principals":["cluster.local/ns/ecom/sa/default"]}}]},{"from":[{"source":{"principals":["cluster.local/ns/monitoring/sa/monitoring-kube-prometheus-prometheus"]}}]}],"selector":{"matchLabels":{"app":"auth-service"}}}}
+  creationTimestamp: "2026-06-03T09:25:02Z"
+  generation: 2
+  name: auth-service-policy
+  namespace: ecom
+  resourceVersion: "8325048"
+  uid: e4bc0b63-e314-43db-9458-d1fc728289ea
+spec:
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/ecom/sa/default
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/monitoring/sa/monitoring-kube-prometheus-prometheus
+  selector:
+    matchLabels:
+      app: auth-service
