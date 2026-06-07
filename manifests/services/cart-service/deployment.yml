@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: cart-service
+        version: v1  
     spec:
       containers:
       - name: cart

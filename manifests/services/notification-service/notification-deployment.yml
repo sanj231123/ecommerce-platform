@@ -16,6 +16,7 @@ spec:
     metadata:
       labels:
         app: notification-service
+        version: v1  
 
     spec:
       containers:

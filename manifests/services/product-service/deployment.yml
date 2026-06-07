@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         app: product-service
-
+        version: v1
     spec:
       containers:
       - name: product
