@@ -10,12 +10,16 @@ spec:
       app: api-gateway
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true" # 🔥 Prevents the TLS/Cert error on health probes
       labels:
         app: api-gateway
+        version: v1                                    # 🔥 Feeds data into Kiali for the versioned app graph
     spec:
       containers:
       - name: api-gateway
-        image: sanj231123/api-gateway:v18  # 🔥 change this
+        image: sanj231123/api-gateway:v18
+        imagePullPolicy: IfNotPresent                  # ⚡ Added for stability; forces K8s to pull if missing
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -26,7 +30,6 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
-
         readinessProbe:
           httpGet:
             path: /health
@@ -36,12 +39,9 @@ spec:
           timeoutSeconds: 3
           failureThreshold: 3  
         resources:
-
-          requests:
+          requests:                                    # ⚡ Cleaned up messy spaces here
             cpu: "100m"
             memory: "128Mi"
-
           limits:
             cpu: "500m"
             memory: "512Mi"
-  
