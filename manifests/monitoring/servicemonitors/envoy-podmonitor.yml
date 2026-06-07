@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: istio-envoy
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  namespaceSelector:
+    any: true
+  selector:
+    matchExpressions:
+    - key: security.istio.io/tlsMode
+      operator: Exists
+  podMetricsEndpoints:
+  - path: /stats/prometheus
+    port: http-envoy-prom
+    interval: 30s        # 🔥 INCREASED FROM 15s: Reduces stress on your local KIND cluster
+    scrapeTimeout: 25s   # 🔥 ADDED: Gives Envoy plenty of time to respond, preventing context deadline timeouts

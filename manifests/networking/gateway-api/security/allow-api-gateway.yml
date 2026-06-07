@@ -4,11 +4,24 @@ metadata:
   name: allow-api-gateway
   namespace: ecom
 spec:
-  selector:
-    matchLabels:
-      app: api-gateway
-
+  # Removing selector makes this apply to all workloads in the 'ecom' namespace
   action: ALLOW
-
   rules:
-  - {}
+  
+  # Rule 1: Allow ANY external/public traffic hitting your app ingestion ports
+  - to:
+    - operation:
+        ports: ["8080", "9095"]
+
+  # Rule 2: Allow all internal microservice-to-microservice traffic inside the ecom mesh
+  - from:
+    - source:
+        namespaces: ["ecom"]
+
+  # Rule 3: Allow the prometheus monitoring pod to scrape sidecar stats ports
+  - from:
+    - source:
+        namespaces: ["monitoring"]
+    to:
+    - operation:
+        ports: ["15020", "15090"]
