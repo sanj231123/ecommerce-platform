@@ -61,4 +61,3 @@ resources:
 
   # CronJobs
   - cronjobs/etcd-backup-cronjob.yml
-  - cronjobs/unpaid-order-cleanup.yml
