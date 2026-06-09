@@ -39,6 +39,7 @@ resources:
   - services/notification-service/service.yml
 
   # Infrastructure
+  - infra/mysql/pvc.yml
   - infra/mysql/deployment.yml
   - infra/mysql/service.yml
 
