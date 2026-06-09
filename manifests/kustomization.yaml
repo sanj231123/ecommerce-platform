@@ -61,3 +61,10 @@ resources:
 
   # CronJobs
   - cronjobs/etcd-backup-cronjob.yml
+
+  # Network Policy
+  - security/default-deny.yml
+  - security/allow-dns.yml
+  - security/allow-prometheus.yml
+  - security/allow-mysql.yml
+  - security/allow-istio.yml
