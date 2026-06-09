@@ -4,13 +4,35 @@ metadata:
   name: allow-istio
   namespace: ecom
 spec:
-  podSelector: {}
-
+  podSelector: {} # Applies to all pods in the namespace
   policyTypes:
     - Ingress
-
+    - Egress
   ingress:
+    # 1. Allow incoming traffic from Istio Ingress Gateway
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: istio-system
+    # 2. Allow Container-to-Container & Sidecar-to-Sidecar mTLS traffic
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 15001 # Istio outbound envoy port
+        - protocol: TCP
+          port: 15006 # Istio inbound envoy port
+  egress:
+    # 1. Allow pods to communicate with each other over application ports
+    - to:
+        - podSelector: {}
+    # 2. Allow sidecars to talk to Istio Control Plane (istiod)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-system
+      ports:
+        - protocol: TCP
+          port: 15012
+        - protocol: TCP
+          port: 15017
