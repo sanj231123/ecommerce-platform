@@ -9,24 +9,31 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # 1. Allow incoming traffic from Istio Ingress Gateway
+    # 1. Allow ALL traffic coming from inside the same namespace (App-to-App traffic)
+    - from:
+        - podSelector: {}
+
+    # 2. Allow traffic from Istio Ingress Gateway
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: istio-system
-    # 2. Allow Container-to-Container & Sidecar-to-Sidecar mTLS traffic
-    - from:
-        - podSelector: {}
-      ports:
+
+    # 3. Allow Kubelet Health Probes (Liveness/Readiness) and Istio control ports
+    - ports:
         - protocol: TCP
-          port: 15001 # Istio outbound envoy port
+          port: 15001 # Istio outbound proxy
         - protocol: TCP
-          port: 15006 # Istio inbound envoy port
+          port: 15006 # Istio inbound proxy
+        - protocol: TCP
+          port: 15021 # Istio health check port (Crucial!)
+
   egress:
-    # 1. Allow pods to communicate with each other over application ports
+    # 1. Allow application pods to talk to each other inside the namespace
     - to:
         - podSelector: {}
-    # 2. Allow sidecars to talk to Istio Control Plane (istiod)
+
+    # 2. Allow Istio sidecars to talk to Istio Control Plane (istiod)
     - to:
         - namespaceSelector:
             matchLabels:
