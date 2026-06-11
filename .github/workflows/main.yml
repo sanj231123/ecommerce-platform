@@ -1,0 +1,161 @@
+name: Ecommerce Production GitOps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Detect Changed Services
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend: 'services-code/frontend/**'
+            api-gateway: 'services-code/api-gateway/**'
+            auth-service: 'services-code/auth-service/**'
+            user-service: 'services-code/user-service/**'
+            product-service: 'services-code/product-service/**'
+            cart-service: 'services-code/cart-service/**'
+            order-service: 'services-code/order-service/**'
+            payment-service: 'services-code/payment-service/**'
+            notification-service: 'services-code/notification-service/**'
+
+  build-and-push:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.services != '[]' && needs.detect-changes.outputs.services != '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Short Git SHA Tag
+        run: |
+          echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t sanj231123/${{ matrix.service }}:${{ env.TAG }} \
+            ./services-code/${{ matrix.service }}
+
+      - name: Push Docker Image
+        run: |
+          docker push sanj231123/${{ matrix.service }}:${{ env.TAG }}
+
+      - name: Update Target Manifest File
+        run: |
+          case "${{ matrix.service }}" in
+            frontend)
+              sed -i "s|image: .*|image: sanj231123/frontend:${{ env.TAG }}|g" manifests/frontend/deployment.yml
+              mkdir -p tmp-manifests/frontend
+              cp manifests/frontend/deployment.yml tmp-manifests/frontend/
+              ;;
+            api-gateway)
+              sed -i "s|image: .*|image: sanj231123/api-gateway:${{ env.TAG }}|g" manifests/services/api-gateway/deployment.yml
+              mkdir -p tmp-manifests/services/api-gateway
+              cp manifests/services/api-gateway/deployment.yml tmp-manifests/services/api-gateway/
+              ;;
+            auth-service)
+              sed -i "s|image: .*|image: sanj231123/auth-service:${{ env.TAG }}|g" manifests/services/auth-service/deployment.yml
+              mkdir -p tmp-manifests/services/auth-service
+              cp manifests/services/auth-service/deployment.yml tmp-manifests/services/auth-service/
+              ;;
+            user-service)
+              sed -i "s|image: .*|image: sanj231123/user-service:${{ env.TAG }}|g" manifests/services/user-service/deployment.yml
+              sed -i "s|image: .*|image: sanj231123/user-service:${{ env.TAG }}|g" manifests/services/user-service/user-service-v2-deployment.yml
+              mkdir -p tmp-manifests/services/user-service
+              cp manifests/services/user-service/deployment.yml tmp-manifests/services/user-service/
+              cp manifests/services/user-service/user-service-v2-deployment.yml tmp-manifests/services/user-service/
+              ;;
+            product-service)
+              sed -i "s|image: .*|image: sanj231123/product-service:${{ env.TAG }}|g" manifests/services/product-service/deployment.yml
+              mkdir -p tmp-manifests/services/product-service
+              cp manifests/services/product-service/deployment.yml tmp-manifests/services/product-service/
+              ;;
+            cart-service)
+              sed -i "s|image: .*|image: sanj231123/cart-service:${{ env.TAG }}|g" manifests/services/cart-service/deployment.yml
+              mkdir -p tmp-manifests/services/cart-service
+              cp manifests/services/cart-service/deployment.yml tmp-manifests/services/cart-service/
+              ;;
+            order-service)
+              sed -i "s|image: .*|image: sanj231123/order-service:${{ env.TAG }}|g" manifests/services/order-service/deployment.yml
+              mkdir -p tmp-manifests/services/order-service
+              cp manifests/services/order-service/deployment.yml tmp-manifests/services/order-service/
+              ;;
+            payment-service)
+              sed -i "s|image: .*|image: sanj231123/payment-service:${{ env.TAG }}|g" manifests/services/payment-service/deployment.yml
+              mkdir -p tmp-manifests/services/payment-service
+              cp manifests/services/payment-service/deployment.yml tmp-manifests/services/payment-service/
+              ;;
+            notification-service)
+              sed -i "s|image: .*|image: sanj231123/notification-service:${{ env.TAG }}|g" manifests/services/notification-service/notification-deployment.yml
+              mkdir -p tmp-manifests/services/notification-service
+              cp manifests/services/notification-service/notification-deployment.yml tmp-manifests/services/notification-service/
+              ;;
+          esac
+
+      - name: Upload Manifest Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest-${{ matrix.service }}
+          path: tmp-manifests/
+
+  gitops-commit:
+    needs: [detect-changes, build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download All Isolated Manifests
+        uses: actions/download-artifact@v4
+        with:
+          path: manifests-updates/
+
+      - name: Merge Manifest Updates
+        run: |
+          if [ -d "manifests-updates" ]; then
+            find manifests-updates/ -type f | while read file; do
+              target_path=$(echo "$file" | sed -E 's|manifests-updates/[^/]+/||')
+              mkdir -p "$(dirname "manifests/$target_path")"
+              cp "$file" "manifests/$target_path"
+            done
+            rm -rf manifests-updates/
+          fi
+
+      - name: Commit and Push to Git
+        run: |
+          git config --global user.name "${{ vars.GITOPS_USER_NAME }}"
+          git config --global user.email "${{ vars.GITOPS_USER_EMAIL }}"
+          
+          git add manifests/
+          
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: production release image versions to ${GITHUB_SHA::7} [skip ci]"
+            git push origin main
+          else
+            echo "No manifest changes detected. Skipping commit."
+          fi
