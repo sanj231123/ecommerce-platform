@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: product
-        image: sanj231123/product-service:v3
+        image: sanj231123/product-service:ea8a784
 
         ports:
         - containerPort: 8083
