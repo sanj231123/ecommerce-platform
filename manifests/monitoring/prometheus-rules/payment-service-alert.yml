@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: payment-service-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring  
+
+spec:
+  groups:
+  - name: payment.rules
+
+    rules:
+
+    - alert: PaymentServiceDown
+
+      expr: kube_deployment_status_replicas_available{deployment="payment-service",namespace="ecom"} < 1
+
+      for: 1m
+
+      labels:
+        severity: critical
+
+      annotations:
+        description: Payment Service is DOWN
+        summary: Payment Service unavailable

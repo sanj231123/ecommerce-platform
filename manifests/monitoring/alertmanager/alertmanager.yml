@@ -1,0 +1,47 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: slack-notifications
+
+  group_by:
+    - alertname
+    - namespace
+
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 1h
+
+receivers:
+- name: slack-notifications
+
+  slack_configs:
+  - api_url_file: "/etc/alertmanager/secrets/alertmanager-slack-secret/slack-webhook-url"
+
+    channel: "#devops2-alerts"
+
+    send_resolved: true
+
+    title: >-
+      [{{ .Status | toUpper }}]
+      {{ .CommonLabels.alertname }}
+
+    text: |
+      *Alert Name:* {{ .CommonLabels.alertname }}
+
+      *Status:* {{ .Status }}
+
+      *Severity:* {{ .CommonLabels.severity }}
+
+      *Namespace:* {{ .CommonLabels.namespace }}
+
+      *Summary:*
+      {{ .CommonAnnotations.summary }}
+
+      *Description:*
+      {{ .CommonAnnotations.description }}
+
+      *Started At:*
+      {{ .Alerts.Firing | len }} firing alert(s)
+
+templates: []

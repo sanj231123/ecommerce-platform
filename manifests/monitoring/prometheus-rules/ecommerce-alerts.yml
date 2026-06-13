@@ -1,0 +1,84 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ecommerce-alerts
+  namespace: monitoring
+
+spec:
+  groups:
+
+  - name: ecommerce-services
+
+    rules:
+
+    - alert: PaymentServiceDown
+      expr: up{job="payment-service"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Payment Service Down
+        description: Payment service is unreachable for more than 1 minute.
+
+    - alert: OrderServiceDown
+      expr: up{job="order-service"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Order Service Down
+        description: Order service is unreachable.
+
+    - alert: ProductServiceDown
+      expr: up{job="product-service"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Product Service Down
+        description: Product service is unreachable.
+
+    - alert: CartServiceDown
+      expr: up{job="cart-service"} == 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: Cart Service Down
+        description: Cart service is unreachable.
+
+    - alert: UserServiceDown
+      expr: up{job="user-service"} == 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: User Service Down
+        description: User service is unreachable.
+
+    - alert: APIGatewayDown
+      expr: up{job="api-gateway"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: API Gateway Down
+        description: API Gateway is unreachable.
+
+    - alert: AuthServiceDown
+      expr: up{job="auth-service"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Auth Service Down
+        description: Auth service is unreachable.
+
+    - alert: NotificationServiceDown
+      expr: up{job="notification-service"} == 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: Notification Service Down
+        description: Notification service is unreachable.
