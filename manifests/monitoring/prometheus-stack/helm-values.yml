@@ -9,6 +9,10 @@ prometheus:
   service:
     type: NodePort
     nodePort: 32001
+  prometheusSpec:
+    podMetadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
 
 alertmanager:
   enabled: true
@@ -18,3 +22,11 @@ prometheus-node-exporter:
 
 kube-state-metrics:
   enabled: true
+  prometheus:
+    monitor:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+
+prometheusOperator:
+  deploymentAnnotations:
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
