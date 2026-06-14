@@ -1,0 +1,41 @@
+User
+ │
+ ▼
+Gateway API
+ │
+ ▼
+Istio Gateway
+ │
+ ▼
+API Gateway
+ │
+ ├── Auth Service
+ │
+ ├── User Service
+ │
+ ├── Product Service
+ │
+ ├── Cart Service
+ │
+ ├── Order Service
+ │
+ ├── Payment Service
+ │
+ └── Notification Service
+      │
+      ├── Redis
+      ├── RabbitMQ
+      └── MySQL
+
+Prometheus
+Grafana
+Loki
+AlertManager
+
+GitHub Actions
+ ↓
+DockerHub
+ ↓
+ArgoCD
+ ↓
+Kubernetes
