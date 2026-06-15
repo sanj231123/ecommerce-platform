@@ -76,3 +76,9 @@ spec:
 
         - name: JWT_SECRET
           value: "secret123"
+        
+        - name: RAZORPAY_KEY_ID
+          value: "rzp_test_SqlQYRIElPuZio"
+
+        - name: RAZORPAY_KEY_SECRET
+          value: "yOH6eC08nS5I2QZVVur7eMTy"
