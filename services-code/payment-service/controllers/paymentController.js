@@ -13,51 +13,83 @@ const createPayment = async (req, res) => {
 
   try {
 
+    console.log("=================================");
+    console.log("PAYMENT REQUEST RECEIVED");
+    console.log("BODY:", req.body);
+    console.log("=================================");
+
     const { orderId, amount } = req.body;
+
+    if (!orderId) {
+
+      return res.status(400).json({
+        success: false,
+        message: "orderId is required"
+      });
+
+    }
+
+    if (!amount || Number(amount) <= 0) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid amount"
+      });
+
+    }
+
+    console.log("RAZORPAY KEY:", process.env.RAZORPAY_KEY_ID);
 
     const options = {
 
-      amount: amount * 100,
+      amount: Number(amount) * 100,
 
       currency: "INR",
 
-      receipt: "receipt_" + orderId,
+      receipt: `receipt_${orderId}`
 
     };
 
-    const order =
-      await razorpay.orders.create(
-        options
-      );
+    console.log("ORDER OPTIONS:", options);
 
-    res.json({
+    const order =
+      await razorpay.orders.create(options);
+
+    console.log("ORDER CREATED SUCCESSFULLY");
+    console.log(order);
+
+    return res.status(200).json({
 
       success: true,
 
-      razorpayOrder: order,
+      razorpayOrder: order
 
     });
 
   } catch (err) {
 
-    console.error(
-      "RAZORPAY ERROR:",
-      err
-    );
+    console.log("=================================");
+    console.log("RAZORPAY ERROR");
+    console.log("=================================");
 
-    res.status(500).json({
+    console.log("MESSAGE:", err?.message);
+    console.log("STATUS:", err?.statusCode);
+    console.log("STACK:", err?.stack);
+    console.log("ERROR:", err);
+
+    return res.status(500).json({
 
       success: false,
 
       message:
-        "Razorpay order failed",
+        err?.message ||
+        "Razorpay order failed"
 
     });
 
   }
 
 };
-
 
 // =====================================
 // VERIFY PAYMENT
