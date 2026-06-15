@@ -23,7 +23,7 @@ spec:
 
       - name: payment-service
 
-        image: sanj231123/payment-service:v6
+        image: sanj231123/payment-service:53bef6a
 
         ports:
         - containerPort: 5007
