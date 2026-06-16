@@ -52,6 +52,13 @@ const createPayment = async (req, res) => {
 
     console.log("ORDER OPTIONS:", options);
 
+    console.log("KEY:", process.env.RAZORPAY_KEY_ID);
+    console.log("SECRET EXISTS:", !!process.env.RAZORPAY_KEY_SECRET);
+    console.log("RAZORPAY INSTANCE:");
+    console.log(razorpay);
+    console.log("ORDERS OBJECT:");
+    console.log(razorpay.orders);
+
     const order =
       await razorpay.orders.create(options);
 
