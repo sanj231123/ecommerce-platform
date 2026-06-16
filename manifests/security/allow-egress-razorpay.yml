@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-external
+  namespace: ecom
+spec:
+  podSelector:
+    matchLabels:
+      app: payment-service # Ensure this matches your payment-service pod labels
+  policyTypes:
+  - Egress
+  egress:
+  # This block allows egress to all external internet IPs on port 443
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 443
